@@ -9,56 +9,52 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.iktpreobuka.eDiary.entities.StudentEntity;
-import com.iktpreobuka.eDiary.repositories.StudentRepository;
-
-
-
+import com.iktpreobuka.eDiary.entities.SubjectEntity;
+import com.iktpreobuka.eDiary.repositories.SubjectRepository;
 
 @RestController
-@RequestMapping(path = "/api/v1/student")
-public class StudentController {
+@RequestMapping(path = "/api/v1/subject")
+public class SubjectController {
 
-	
 	@Autowired
-	StudentRepository studentRepository;
+	SubjectRepository subjectRepository;
 	
 	@RequestMapping(method = RequestMethod.POST)
-	public ResponseEntity<?> addNewStudent(@RequestBody StudentEntity student /*@RequestParam String name, @RequestParam String surname*/) {
-		StudentEntity se = new StudentEntity();
-		se.setName(student.getName());
-		se.setSurname(student.getSurname());
-		studentRepository.save(se);
-		return new ResponseEntity<StudentEntity>(se, HttpStatus.OK);
+	public SubjectEntity addNewSubject(@RequestBody SubjectEntity subject /*@RequestParam String name, @RequestParam String surname*/) {
+	SubjectEntity se = new SubjectEntity();
+	se.setSubject(subject.getSubject());
+	se.setFund(subject.getFund());
+	subjectRepository.save(se);
+	return se;
 	}
 	
 	@RequestMapping(method = RequestMethod.GET)
-	public Iterable<StudentEntity> gettAllStudents() {
-		return studentRepository.findAll();
+	public Iterable<SubjectEntity> gettAllSubjects() {
+		return subjectRepository.findAll();
 	}
 	
 	@RequestMapping(method = RequestMethod.GET, value = "/{id}")
-	public ResponseEntity<?> getById(@PathVariable Long id) {
-		StudentEntity se = studentRepository.findOne(id);
+	public ResponseEntity<?> getById(@PathVariable Integer id) {
+		SubjectEntity se = subjectRepository.findOne(id);
 		try {
 			if (se != null) {		// ako je korisnik pronadjen vratiti 200
-				return new ResponseEntity<StudentEntity>(se, HttpStatus.OK);
+				return new ResponseEntity<SubjectEntity>(se, HttpStatus.OK);
 			}		// ako korisnik nije pronadjen vratiti 404
-			return new ResponseEntity<RESTError>(new RESTError(1, "student not found"), HttpStatus.NOT_FOUND);
+			return new ResponseEntity<RESTError>(new RESTError(1, "subject not found"), HttpStatus.NOT_FOUND);
 		} catch (Exception e) { // u slucaju izuzetka vratiti 500
 			return new ResponseEntity<RESTError>(new RESTError(2, "Exception occurred: " + e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
 			}
 	}
 	
 	@RequestMapping(method = RequestMethod.DELETE, value = "/{id}")
-	public ResponseEntity<?> deleteById(@PathVariable Long id) {
-		StudentEntity se = studentRepository.findOne(id);
+	public ResponseEntity<?> deleteById(@PathVariable Integer id) {
+		SubjectEntity se = subjectRepository.findOne(id);
 		try {
 			if (se != null) {
-				studentRepository.delete(se);
-				return new ResponseEntity<StudentEntity>(se, HttpStatus.OK);
+				subjectRepository.delete(se);
+				return new ResponseEntity<SubjectEntity>(se, HttpStatus.OK);
 			}
-			return new ResponseEntity<RESTError>(new RESTError(1, "student not found"), HttpStatus.NOT_FOUND);
+			return new ResponseEntity<RESTError>(new RESTError(1, "subject not found"), HttpStatus.NOT_FOUND);
 		} catch (Exception e) {
 			return new ResponseEntity<RESTError>(new RESTError(2, "Exception occurred: " + e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
 			}
@@ -66,15 +62,15 @@ public class StudentController {
 	
 	
 	@RequestMapping(method = RequestMethod.PUT, value = "/{id}")
-	public ResponseEntity<?> modifyById (@RequestBody StudentEntity student, @PathVariable Long id) {
-		StudentEntity se = studentRepository.findOne(id);
+	public ResponseEntity<?> modifyById (@RequestBody SubjectEntity subject, @PathVariable Integer id) {
+		SubjectEntity se = subjectRepository.findOne(id);
 		try {
 			if (se != null) {
-				if (student.getName()!=null) {
-					se.setName(student.getName());
+				if (subject.getSubject()!=null) {
+					se.setSubject(subject.getSubject());
 				}
-				if (student.getSurname()!=null) {
-					se.setSurname(student.getSurname());
+				if (subject.getFund()!=null) {
+					se.setFund(subject.getFund());
 				}
 //				if (user.getEmail()!=null) {
 //					se.setEmail(user.getEmail());
@@ -82,13 +78,12 @@ public class StudentController {
 //				if (user.getPassword()!=null) {
 //					se.setPassword(user.getPassword());
 //				}
-				studentRepository.save(se);
-				return new ResponseEntity<StudentEntity>(se, HttpStatus.OK);
+				subjectRepository.save(se);
+				return new ResponseEntity<SubjectEntity>(se, HttpStatus.OK);
 			} 
-			return new ResponseEntity<RESTError>(new RESTError(1, "student not found"), HttpStatus.NOT_FOUND);
+			return new ResponseEntity<RESTError>(new RESTError(1, "subject not found"), HttpStatus.NOT_FOUND);
 		} catch (Exception e) {
 			return new ResponseEntity<RESTError>(new RESTError(2, "Exception occurred: " + e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
 			}
 	}
-	
 }
