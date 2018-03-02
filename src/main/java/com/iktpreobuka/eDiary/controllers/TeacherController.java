@@ -1,5 +1,8 @@
 package com.iktpreobuka.eDiary.controllers;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -9,7 +12,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.iktpreobuka.eDiary.entities.SubjectEntity;
 import com.iktpreobuka.eDiary.entities.TeacherEntity;
+import com.iktpreobuka.eDiary.repositories.SubjectRepository;
 import com.iktpreobuka.eDiary.repositories.TeacherRepository;
 
 @RestController
@@ -19,6 +24,9 @@ public class TeacherController {
 	
 	@Autowired
 	TeacherRepository teacherRepository;
+	
+	@Autowired
+	SubjectRepository subjectRepository;
 	
 	@RequestMapping(method = RequestMethod.POST)
 	public TeacherEntity addNewStudent(@RequestBody TeacherEntity teacher /*@RequestParam String name, @RequestParam String surname*/) {
@@ -88,7 +96,18 @@ public class TeacherController {
 			}
 	}
 	
-	
+//	@RequestMapping(method = RequestMethod.PUT, value = "/{teacherId}/{subjectId}")
+//	public  ResponseEntity<?> addSubjectById (@PathVariable Long teacherId, @PathVariable Integer subjectId) {
+//		TeacherEntity te = teacherRepository.findOne(teacherId);
+//		SubjectEntity se = subjectRepository.findOne(subjectId);
+//		try {
+//			if ((te != null) && (se != null)) {
+//				List<SubjectEntity> subject = new ArrayList();
+//				subject.add(se);
+//				te.setTeacherOnSubjects(subject);
+//			}
+//		}
+//	}
 	
 	
 	

@@ -1,5 +1,9 @@
 package com.iktpreobuka.eDiary.controllers;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -10,7 +14,9 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.iktpreobuka.eDiary.entities.SubjectEntity;
+import com.iktpreobuka.eDiary.entities.TeacherEntity;
 import com.iktpreobuka.eDiary.repositories.SubjectRepository;
+import com.iktpreobuka.eDiary.repositories.TeacherRepository;
 
 @RestController
 @RequestMapping(path = "/api/v1/subject")
@@ -18,6 +24,10 @@ public class SubjectController {
 
 	@Autowired
 	SubjectRepository subjectRepository;
+	
+	@Autowired
+	TeacherRepository teacherRepository;
+	
 	
 	@RequestMapping(method = RequestMethod.POST)
 	public SubjectEntity addNewSubject(@RequestBody SubjectEntity subject /*@RequestParam String name, @RequestParam String surname*/) {
@@ -34,7 +44,7 @@ public class SubjectController {
 	}
 	
 	@RequestMapping(method = RequestMethod.GET, value = "/{id}")
-	public ResponseEntity<?> getById(@PathVariable Integer id) {
+	public ResponseEntity<?> getById(@PathVariable Long id) {
 		SubjectEntity se = subjectRepository.findOne(id);
 		try {
 			if (se != null) {		// ako je korisnik pronadjen vratiti 200
@@ -47,7 +57,7 @@ public class SubjectController {
 	}
 	
 	@RequestMapping(method = RequestMethod.DELETE, value = "/{id}")
-	public ResponseEntity<?> deleteById(@PathVariable Integer id) {
+	public ResponseEntity<?> deleteById(@PathVariable Long id) {
 		SubjectEntity se = subjectRepository.findOne(id);
 		try {
 			if (se != null) {
@@ -62,7 +72,7 @@ public class SubjectController {
 	
 	
 	@RequestMapping(method = RequestMethod.PUT, value = "/{id}")
-	public ResponseEntity<?> modifyById (@RequestBody SubjectEntity subject, @PathVariable Integer id) {
+	public ResponseEntity<?> modifyById (@RequestBody SubjectEntity subject, @PathVariable Long id) {
 		SubjectEntity se = subjectRepository.findOne(id);
 		try {
 			if (se != null) {
@@ -86,4 +96,55 @@ public class SubjectController {
 			return new ResponseEntity<RESTError>(new RESTError(2, "Exception occurred: " + e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
 			}
 	}
+	
+	@RequestMapping(method = RequestMethod.PUT, value = "/{subjectId}/{teacherId}")
+	public  ResponseEntity<?> addTeacherById (@PathVariable Long teacherId, @PathVariable Long subjectId) {
+		TeacherEntity te = teacherRepository.findOne(teacherId);
+		SubjectEntity se = subjectRepository.findOne(subjectId);
+		try {
+			if ((te != null) && (se != null)) {
+				te.getTeacherOnSubjects().add(se);
+				se.getTeachersOnSubject().add(te);
+				teacherRepository.save(te);
+				subjectRepository.save(se);
+				return new ResponseEntity<SubjectEntity>(se, HttpStatus.OK);
+			} else if ((te == null) && (se == null))  {
+				return new ResponseEntity<RESTError>(new RESTError(1, "subject and teacher not found"), HttpStatus.NOT_FOUND);
+			} else if (te == null)  {
+				return new ResponseEntity<RESTError>(new RESTError(1, "teacher not found"), HttpStatus.NOT_FOUND);
+			} /*else if (se == null)  {*/
+				return new ResponseEntity<RESTError>(new RESTError(1, "subject not found"), HttpStatus.NOT_FOUND);
+		} catch (Exception e) {
+			return new ResponseEntity<RESTError>(new RESTError(2, "Exception occurred: " + e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
+			}	
+	}
+	
+	@RequestMapping(method = RequestMethod.DELETE, value = "/{subjectId}/{teacherId}")
+	public  ResponseEntity<?> deleteTeacherById (@PathVariable Long teacherId, @PathVariable Long subjectId) {
+		TeacherEntity te = teacherRepository.findOne(teacherId);
+		SubjectEntity se = subjectRepository.findOne(subjectId);
+		try {
+			if ((te != null) && (se != null)) {
+				Set<TeacherEntity> teachers = se.getTeachersOnSubject();
+				if (teachers.contains(te)) {
+					te.getTeacherOnSubjects().remove(se);
+					se.getTeachersOnSubject().remove(te);
+					teacherRepository.save(te);
+					subjectRepository.save(se);
+					return new ResponseEntity<SubjectEntity>(se, HttpStatus.OK);
+				} else 
+					return new ResponseEntity<RESTError>(new RESTError(1, "teacher not found on subject"), HttpStatus.NOT_FOUND);
+			} else if ((te == null) && (se == null))  {
+				return new ResponseEntity<RESTError>(new RESTError(1, "subject and teacher not found"), HttpStatus.NOT_FOUND);
+			} else if (te == null)  {
+				return new ResponseEntity<RESTError>(new RESTError(1, "teacher not found"), HttpStatus.NOT_FOUND);
+			} /*else if (se == null)  {*/
+				return new ResponseEntity<RESTError>(new RESTError(1, "subject not found"), HttpStatus.NOT_FOUND);
+		} catch (Exception e) {
+			return new ResponseEntity<RESTError>(new RESTError(2, "Exception occurred: " + e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
+			}	
+	}
+	
+	
+	
 }

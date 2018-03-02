@@ -4,6 +4,6 @@ import org.springframework.data.repository.CrudRepository;
 
 import com.iktpreobuka.eDiary.entities.SubjectEntity;
 
-public interface SubjectRepository extends CrudRepository<SubjectEntity, Integer>{
+public interface SubjectRepository extends CrudRepository<SubjectEntity, Long>{
 
 }
